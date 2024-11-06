@@ -2,14 +2,14 @@
   tags: apache,httpd,centOS
   package:
     name: 
-      - httpd
-      - php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
 
 - name: Start httpd apache service 
   tags: apache, httpd, centOS
   service: 
-    name: httpd
+    name: "{{ apache_service }}"
     state: started 
     enabled: yes
   when: ansible_distribution == "CentOS"
@@ -19,16 +19,9 @@
   lineinfile:
     path: /etc/httpd/conf/httpd.conf
     regexp: '^ServerAdmin'
-    line: ServerAdmin somebody@somewhere.net
+    line: ServerAdmin somebody@somewhere.com.au
   when: ansible_distribution == "CentOS"
-  register: httpd
-
-- name: Restart httpd
-  tags: apache,httpd,centOS
-  service: 
-    name: httpd
-    state: restarted
-  when: httpd.changed
+  notify: restart_apache
 
 - name: copy default html file for size 
   tags: httpd
